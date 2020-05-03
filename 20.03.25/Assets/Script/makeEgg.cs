@@ -20,6 +20,7 @@ public class makeEgg : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (UICtrl.IsPause) return;
         if (availableEgg > 0)
         {
             if (Input.GetKeyDown(KeyCode.LeftShift))

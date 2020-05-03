@@ -20,7 +20,8 @@ public class EatMushroom : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        setUpPos();
+        if (UICtrl.IsPause) return;
+        if (pos.y < -160.0f) { setUpPos(); }
         Vector3 distance = player.transform.position - this.transform.position;
         if(distance.sqrMagnitude<200)
         {
@@ -37,15 +38,16 @@ public class EatMushroom : MonoBehaviour
     void setUpPos()
     {
         pos = transform.position;
-        if (pos.y < -200.0f)
-        {
-            float randomX = Random.Range(1.0f, 996.0f);
-            float randomZ = Random.Range(1.0f, 996.0f);
-            this.transform.position = new Vector3(randomX, 100.0f, randomZ);
-        }
+       float randomX = Random.Range(1.0f, 996.0f);
+       float randomZ = Random.Range(1.0f, 996.0f);
+       this.transform.position = new Vector3(randomX, 100.0f, randomZ);
     }
     private void OnCollisionEnter(Collision collision)
     {
+        if(collision.gameObject.tag != "Ground" && collision.gameObject.tag != "Player"
+            && collision.gameObject.tag != "Chick") { setUpPos(); return; }
+      //  Debug.Log("Mushroom");
         GetComponent<MeshRenderer>().enabled = true;
+        return;
     }
 }

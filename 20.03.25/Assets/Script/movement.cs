@@ -26,9 +26,10 @@ public class movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (UICtrl.IsPause) return;
         move();
         jump();
+        
     }
 
     void jump()

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class chickMove : MonoBehaviour
 {
@@ -13,11 +14,13 @@ public class chickMove : MonoBehaviour
 
     private GameObject whiteTree;
     private float lightValue;
-    private const float MaxLight = 50.0f;
+    public float LightValue { get { return lightValue; } set { lightValue = value; } }
+    private const float maxLight = 50.0f;
+    public float MaxLight {get{return maxLight;}}
     // Start is called before the first frame update
     void Start()
     {
-        lightValue = 5.0f;
+        lightValue = 50.0f;
         player = GameObject.FindWithTag("Player");
         chicksCtrl = gameObject.transform.parent.gameObject;
         pos = transform.position;
@@ -27,7 +30,7 @@ public class chickMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        setUpPos();
+        if(pos.y < -160.0f) setUpPos();
         pos = transform.position;
         if (isFollowing)
         {
@@ -41,15 +44,23 @@ public class chickMove : MonoBehaviour
         Vector3 treePos = whiteTree.transform.position;
         pos = transform.position;
         Vector3 distance = new Vector3 (treePos.x, 0, treePos.z) - new Vector3(pos.x, 0, pos.z);
-        Debug.Log(distance.sqrMagnitude);
-        if(isFollowing == false && distance.sqrMagnitude < 1000)
+     //   Debug.Log(distance.sqrMagnitude);
+        if(isFollowing == false && distance.sqrMagnitude < 5000)
         {
           //  Debug.Log("Near the white tree");
             chicksCtrl.GetComponent<ChicksCtrl>().ChicksCount--;
-            if (lightValue < MaxLight)
+            if (whiteTree.gameObject.GetComponentInChildren<Light>().intensity < maxLight)
             {
                 whiteTree.gameObject.GetComponentInChildren<Light>().intensity += lightValue;
-                Debug.Log("Brighting");
+             //   Debug.Log("Brighting");
+             if (whiteTree.gameObject.GetComponentInChildren<Light>().intensity >= maxLight)
+                {
+                    SceneManager.LoadScene("Success");
+                }
+            }
+            else if (whiteTree.gameObject.GetComponentInChildren<Light>().intensity >= maxLight)
+            {
+                SceneManager.LoadScene("Success");
             }
             Destroy(gameObject);
         }
@@ -68,16 +79,16 @@ public class chickMove : MonoBehaviour
 
     void setUpPos()
     {
-        if(pos.y < -200.0f)
-        {
-            float randomX = Random.Range(1.0f, 996.0f);
-            float randomZ = Random.Range(1.0f, 996.0f);
-            this.transform.position = new Vector3(randomX, 100.0f, randomZ);
-        }
+        float randomX = Random.Range(1.0f, 996.0f);
+        float randomZ = Random.Range(1.0f, 996.0f);
+        this.transform.position = new Vector3(randomX, 100.0f, randomZ);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (isFollowing == true) return;
+        if(collision.gameObject.tag != "Ground" && collision.gameObject.tag != "Player" 
+            && collision.gameObject.tag != "Chick") { setUpPos(); return; }
         MeshRenderer[] mrCubeList = this.gameObject.GetComponentsInChildren<MeshRenderer>();
         foreach (MeshRenderer mr in mrCubeList)
         {
